@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>24h Time Calc</title>
+    <!-- iOS PWA meta tags to force it to open like a native app -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Time Calc">
+    
+    <style>
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-color: #000000;
+            --accent-color: #007aff;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1c1c1e;
+                --card-bg: #2c2c2e;
+                --text-color: #ffffff;
+                --accent-color: #0a84ff;
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 90vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        h2 { margin-top: 0; text-align: center; font-weight: 600; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; opacity: 0.8; }
+        input[type="time"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 10px;
+            font-size: 18px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+        .result-box {
+            margin-top: 24px;
+            background: var(--bg-color);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .result-title { font-size: 14px; opacity: 0.6; margin-bottom: 4px; }
+        .result-value { font-size: 28px; font-weight: 700; color: var(--accent-color); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <h2>24-Hour Time Calculator</h2>
+        
+        <div class="input-group">
+            <label for="startTime">Start Time (24h)</label>
+            <input type="time" id="startTime" onchange="calculateTime()">
+        </div>
+
+        <div class="input-group">
+            <label for="endTime">End Time (24h)</label>
+            <input type="time" id="endTime" onchange="calculateTime()">
+        </div>
+
+        <div class="result-box">
+            <div class="result-title">Elapsed Duration</div>
+            <div id="result" class="result-value">0h 0m</div>
+        </div>
+    </div>
+
+    <script>
+        function calculateTime() {
+            const startVal = document.getElementById('startTime').value;
+            const endVal = document.getElementById('endTime').value;
+
+            if (!startVal || !endVal) return;
+
+            // Split hours and minutes
+            const [startH, startM] = startVal.split(':').map(Number);
+            const [endH, endM] = endVal.split(':').map(Number);
+
+            // Convert everything to absolute minutes
+            let startTotalMinutes = (startH * 60) + startM;
+            let endTotalMinutes = (endH * 60) + endM;
+
+            // Midnight crossover logic
+            if (endTotalMinutes < startTotalMinutes) {
+                endTotalMinutes += 24 * 60; // Add a full day's worth of minutes
+            }
+
+            const diffMinutes = endTotalMinutes - startTotalMinutes;
+            const hours = Math.floor(diffMinutes / 60);
+            const minutes = diffMinutes % 60;
+
+            document.getElementById('result').textContent = `${hours}h ${minutes}m`;
+        }
+    </script>
+</body>
+</html>
