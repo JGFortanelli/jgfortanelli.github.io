@@ -28,6 +28,20 @@
             justify-content: center;
             min-height: 85vh;
         }
+        
+        /* Logo styling container */
+        .logo-container {
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .company-logo {
+            width: 180px; /* Adjust size as needed */
+            height: auto;
+            opacity: 0.9;
+        }
+
         .app-container {
             width: 100%;
             max-width: 380px;
@@ -37,22 +51,46 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.3);
             box-sizing: border-box;
         }
-        h2 { margin-top: 0; text-align: center; font-weight: 600; font-size: 22px; margin-bottom: 24px;}
-        .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; opacity: 0.8; }
+        h2 { margin-top: 0; text-align: center; font-weight: 600; font-size: 20px; margin-bottom: 24px; opacity: 0.9;}
         
-        /* Styled for quick manual typing */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        
+        .time-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .input-box-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-size: 11px;
+            opacity: 0.5;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        
         input[type="text"] {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             border: 1px solid var(--input-border);
-            border-radius: 12px;
-            font-size: 22px;
+            border-radius: 10px;
+            font-size: 20px;
             background: var(--bg-color);
             color: var(--text-color);
             box-sizing: border-box;
             text-align: center;
-            letter-spacing: 2px;
             font-weight: 600;
         }
         input[type="text"]:focus {
@@ -60,7 +98,7 @@
             border-color: var(--accent-color);
         }
         .result-box {
-            margin-top: 28px;
+            margin-top: 10px;
             background: var(--bg-color);
             padding: 20px;
             border-radius: 14px;
@@ -73,17 +111,35 @@
 </head>
 <body>
 
+    <div class="logo-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Dsm-firmenich_logo.svg" alt="dsm-firmenich logo" class="company-logo">
+    </div>
+
     <div class="app-container">
         <h2>24-Hour Calculator</h2>
         
-        <div class="input-group">
-            <label for="startTime">Start Time (e.g., 0700 or 1930)</label>
-            <input type="text" id="startTime" inputmode="numeric" maxlength="5" placeholder="00:00" oninput="formatAndCalculate(this)">
+        <div class="section-title">Start Time</div>
+        <div class="time-row">
+            <div class="input-box-wrapper">
+                <label for="startH">Hours (00-23)</label>
+                <input type="text" id="startH" inputmode="numeric" maxlength="2" placeholder="00" oninput="calculateTime()">
+            </div>
+            <div class="input-box-wrapper">
+                <label for="startM">Minutes (00-59)</label>
+                <input type="text" id="startM" inputmode="numeric" maxlength="2" placeholder="00" oninput="calculateTime()">
+            </div>
         </div>
 
-        <div class="input-group">
-            <label for="endTime">End Time (e.g., 1545 or 0415)</label>
-            <input type="text" id="endTime" inputmode="numeric" maxlength="5" placeholder="00:00" oninput="formatAndCalculate(this)">
+        <div class="section-title">End Time</div>
+        <div class="time-row">
+            <div class="input-box-wrapper">
+                <label for="endH">Hours (00-23)</label>
+                <input type="text" id="endH" inputmode="numeric" maxlength="2" placeholder="00" oninput="calculateTime()">
+            </div>
+            <div class="input-box-wrapper">
+                <label for="endM">Minutes (00-59)</label>
+                <input type="text" id="endM" inputmode="numeric" maxlength="2" placeholder="00" oninput="calculateTime()">
+            </div>
         </div>
 
         <div class="result-box">
@@ -93,41 +149,35 @@
     </div>
 
     <script>
-        function formatAndCalculate(input) {
-            // Remove any non-numbers to clean up input
-            let val = input.value.replace(/\D/g, '');
-            
-            // Auto-insert colon if they type 3 or 4 digits
-            if (val.length > 2) {
-                val = val.slice(0, 2) + ':' + val.slice(2, 4);
-            }
-            
-            input.value = val; // Update the input field display
-            
-            // Trigger calculation
-            calculateTime();
-        }
-
         function calculateTime() {
-            const startVal = document.getElementById('startTime').value;
-            const endVal = document.getElementById('endTime').value;
+            const shVal = document.getElementById('startH').value.replace(/\D/g, '');
+            const smVal = document.getElementById('startM').value.replace(/\D/g, '');
+            const ehVal = document.getElementById('endH').value.replace(/\D/g, '');
+            const emVal = document.getElementById('endM').value.replace(/\D/g, '');
 
-            // Only calculate if both fields are fully filled out (HH:MM format = 5 characters)
-            if (startVal.length < 5 || endVal.length < 5) return;
+            document.getElementById('startH').value = shVal;
+            document.getElementById('startM').value = smVal;
+            document.getElementById('endH').value = ehVal;
+            document.getElementById('endM').value = emVal;
 
-            const [startH, startM] = startVal.split(':').map(Number);
-            const [endH, endM] = endVal.split(':').map(Number);
+            if (shVal === "" || smVal === "" || ehVal === "" || emVal === "") {
+                document.getElementById('result').textContent = "0h 0m";
+                return;
+            }
 
-            // Sanity check for valid times
+            const startH = Number(shVal);
+            const startM = Number(smVal);
+            const endH = Number(ehVal);
+            const endM = Number(emVal);
+
             if (startH > 23 || startM > 59 || endH > 23 || endM > 59) {
-                document.getElementById('result').textContent = "Invalid Time";
+                document.getElementById('result').textContent = "Invalid Entry";
                 return;
             }
 
             let startTotalMinutes = (startH * 60) + startM;
             let endTotalMinutes = (endH * 60) + endM;
 
-            // Midnight crossover logic (e.g., 22:00 to 06:00)
             if (endTotalMinutes < startTotalMinutes) {
                 endTotalMinutes += 24 * 60;
             }
@@ -141,4 +191,3 @@
     </script>
 </body>
 </html>
-
